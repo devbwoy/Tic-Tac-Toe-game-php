@@ -58,7 +58,7 @@ To view the SQLite database, you can use the SQLite Browser.
 
    In the project directory, run the following command to install PHP dependencies, including PHPUnit for unit testing:
 
-   `composer install`
+   `composer require --dev phpunit/phpunit`
 
 3. **Run Unit Tests**
 

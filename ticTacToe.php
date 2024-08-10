@@ -44,6 +44,62 @@ class TicTacToe
         $this->displayWelcomeMessage();
     }
 
+    private function createTables()
+    {
+        // SQL statement to create game_result table
+        $createGameResultTable = "
+            CREATE TABLE IF NOT EXISTS game_result (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                winner TEXT NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
+        ";
+
+        // SQL statement to create game_moves table with row and col instead of move_position
+        $createGameMovesTable = "
+            CREATE TABLE IF NOT EXISTS game_moves (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                game_id INTEGER NOT NULL,
+                player TEXT NOT NULL,
+                row INTEGER NOT NULL,
+                col INTEGER NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (game_id) REFERENCES game_result(id)
+            );
+        ";
+
+        // Execute the SQL statements
+        $this->db->exec($createGameResultTable);
+        $this->db->exec($createGameMovesTable);
+    }
+
+    public function insertGameResult($winner)
+    {
+        $stmt = $this->db->prepare("INSERT INTO game_result (winner) VALUES (:winner)");
+        $stmt->bindParam(':winner', $winner);
+        $stmt->execute();
+
+        // Return the last inserted game ID
+        return $this->db->lastInsertId();
+    }
+
+    public function insertGameMoves($gameId, $gameMoves)
+    {
+        $values = [];
+        $params = [];
+        foreach ($gameMoves as $move) {
+            $values[] = "(?, ?, ?, ?)";
+            $params[] = $gameId;
+            $params[] = $move['player'];
+            $params[] = $move['row'];
+            $params[] = $move['col'];
+        }
+
+        $sql = "INSERT INTO game_moves (game_id, player, row, col) VALUES " . implode(", ", $values);
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+    }
+
     private function handleError($exception)
     {
         if ($this->debugMode) {
@@ -133,6 +189,19 @@ class TicTacToe
         echo "\n";
     }
 
+    private function getMoveFromUser()
+    {
+        while (true) {
+            echo "Player " . $this->currentPlayer . ", enter your move (1 2 ... 9): ";
+            $input = trim(fgets(STDIN));
+            if (is_numeric($input) && (int)$input >= 1 && (int)$input <= 9) {
+                return (int)$input;
+            } else {
+                echo "Invalid input! Please enter a number between 1 and 9.\n";
+            }
+        }
+    }
+
     private function makeMove($moveNo)
     {
 
@@ -147,19 +216,6 @@ class TicTacToe
         } else {
             echo "That position is already taken! Choose another one.\n";
             return false;
-        }
-    }
-
-    private function getMoveFromUser()
-    {
-        while (true) {
-            echo "Player " . $this->currentPlayer . ", enter your move (1 2 ... 9): ";
-            $input = trim(fgets(STDIN));
-            if (is_numeric($input) && (int)$input >= 1 && (int)$input <= 9) {
-                return (int)$input;
-            } else {
-                echo "Invalid input! Please enter a number between 1 and 9.\n";
-            }
         }
     }
 
@@ -187,63 +243,6 @@ class TicTacToe
         }
 
         return false;
-    }
-
-
-    private function createTables()
-    {
-        // SQL statement to create game_result table
-        $createGameResultTable = "
-            CREATE TABLE IF NOT EXISTS game_result (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                winner TEXT NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            );
-        ";
-
-        // SQL statement to create game_moves table with row and col instead of move_position
-        $createGameMovesTable = "
-            CREATE TABLE IF NOT EXISTS game_moves (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                game_id INTEGER NOT NULL,
-                player TEXT NOT NULL,
-                row INTEGER NOT NULL,
-                col INTEGER NOT NULL,
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (game_id) REFERENCES game_result(id)
-            );
-        ";
-
-        // Execute the SQL statements
-        $this->db->exec($createGameResultTable);
-        $this->db->exec($createGameMovesTable);
-    }
-
-    public function insertGameResult($winner)
-    {
-        $stmt = $this->db->prepare("INSERT INTO game_result (winner) VALUES (:winner)");
-        $stmt->bindParam(':winner', $winner);
-        $stmt->execute();
-
-        // Return the last inserted game ID
-        return $this->db->lastInsertId();
-    }
-
-    public function insertGameMoves($gameId, $gameMoves)
-    {
-        $values = [];
-        $params = [];
-        foreach ($gameMoves as $move) {
-            $values[] = "(?, ?, ?, ?)";
-            $params[] = $gameId;
-            $params[] = $move['player'];
-            $params[] = $move['row'];
-            $params[] = $move['col'];
-        }
-
-        $sql = "INSERT INTO game_moves (game_id, player, row, col) VALUES " . implode(", ", $values);
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
     }
 }
 

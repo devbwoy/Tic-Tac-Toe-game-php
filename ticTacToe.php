@@ -192,11 +192,11 @@ class TicTacToe
         for ($i = 0; $i < 3; $i++) {
 
             // Display either the move (X or O) or the board position number
-            $first = trim($this->board[$i][0]) ? $this->board[$i][0] : $no;
+            $first = trim($this->board[$i][0]) ? $this->board[$i][0] : $this->getColoredText($no);
             ++$no;
-            $second = trim($this->board[$i][1]) ? $this->board[$i][1] : $no;
+            $second = trim($this->board[$i][1]) ? $this->board[$i][1] : $this->getColoredText($no);
             ++$no;
-            $third = trim($this->board[$i][2]) ? $this->board[$i][2] : $no;
+            $third = trim($this->board[$i][2]) ? $this->board[$i][2] : $this->getColoredText($no);
 
             // Print the row
             echo "  " . $first . " | " . $second . " | " . $third . "\n";
@@ -302,6 +302,12 @@ class TicTacToe
             ($this->board[0][2] === $this->currentPlayer &&
                 $this->board[1][1] === $this->currentPlayer &&
                 $this->board[2][0] === $this->currentPlayer);
+    }
+
+    private function getColoredText($text, $colorCode = "\033[36m")
+    {
+        $reset = "\033[0m"; // Reset code to clear formatting
+        return $colorCode . $text . $reset;
     }
 }
 

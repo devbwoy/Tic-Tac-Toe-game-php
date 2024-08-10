@@ -43,7 +43,7 @@ class TicTacToe
         $this->moveCount = 0; // Initialize move count
         $this->moves = []; // Initialize moves array
         $this->clearScreen(); // Clear the screen for a fresh start
-        $this->displayWelcomeMessage(); // Display the welcome message
+
     }
 
     // Function to create the necessary database tables
@@ -160,6 +160,7 @@ class TicTacToe
     // Function to start the game loop
     protected function startGame()
     {
+        $this->displayWelcomeMessage(); // Display the welcome message
         $this->waitForKeypress(); // Wait for user input to start the game
         $this->displayBoard(); // Display the initial empty board
 

@@ -26,7 +26,7 @@ class TicTacToe
     ];
 
     // Constructor to initialize the game and the database
-    protected function __construct()
+    function __construct()
     {
         $this->initializeDatabase(); // Initialize the database connection
         $this->createTables(); // Create the necessary tables if they don't exist

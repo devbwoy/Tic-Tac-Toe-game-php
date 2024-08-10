@@ -13,7 +13,7 @@ class TicTacToe
     private $moveCount;
     private $moves;
 
-    private $moveToPosition = [
+    private const MOVE_TO_POSITION = [
         1 => ['row' => 0, 'col' => 0],
         2 => ['row' => 0, 'col' => 1],
         3 => ['row' => 0, 'col' => 2],
@@ -136,7 +136,7 @@ class TicTacToe
     private function makeMove($moveNo)
     {
 
-        $movePositionDetail = $this->moveToPosition[$moveNo];
+        $movePositionDetail = self::MOVE_TO_POSITION[$moveNo];
         $row = $movePositionDetail['row'];
         $col = $movePositionDetail['col'];
 

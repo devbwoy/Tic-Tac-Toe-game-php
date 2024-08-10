@@ -46,7 +46,7 @@ To view the SQLite database, you can use the SQLite Browser.
 
 3. **Open the Database**
 
-   Use SQLite Browser to open the `tic_tac_toe.db` file located in the project directory. This file contains the game results and moves.
+   Use SQLite Browser to open the `tictactoe.db` file located in the project directory. This file contains the game results and moves.
 
 ## Running Unit Tests
 

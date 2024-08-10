@@ -86,7 +86,14 @@ class TicTacToe
         while (true) {
             $move = $this->getMoveFromUser(); // numeric value 
             if ($this->makeMove($move)) {
+                $this->togglePlayer();
                 $this->displayBoard();
+                ++$this->moveCount;
+            }
+
+            if ($this->moveCount >= 9) {
+                echo "It's a draw!\n";
+                break;
             }
         }
     }
@@ -140,6 +147,11 @@ class TicTacToe
                 echo "Invalid input! Please enter a number between 1 and 9.\n";
             }
         }
+    }
+
+    private function togglePlayer()
+    {
+        $this->currentPlayer = $this->currentPlayer == 'X' ? 'O' : 'X';
     }
 }
 

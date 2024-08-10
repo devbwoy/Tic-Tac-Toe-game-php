@@ -5,7 +5,20 @@ class TicTacToe
     private $debugMode;
     private $board;
     private $currentPlayer;
-    private $moveCount = 0;
+    private $moveCount;
+    private $moves;
+
+    private $moveToPosition = [
+        1 => ['row' => 0, 'col' => 0],
+        2 => ['row' => 0, 'col' => 1],
+        3 => ['row' => 0, 'col' => 2],
+        4 => ['row' => 1, 'col' => 0],
+        5 => ['row' => 1, 'col' => 1],
+        6 => ['row' => 1, 'col' => 2],
+        7 => ['row' => 2, 'col' => 0],
+        8 => ['row' => 2, 'col' => 1],
+        9 => ['row' => 2, 'col' => 2],
+    ];
 
     protected function __construct()
     {
@@ -15,7 +28,10 @@ class TicTacToe
             [' ', ' ', ' '], // Middle row
             [' ', ' ', ' ']  // Bottom row
         ];
-        $this->currentPlayer = 'X';
+
+        $this->currentPlayer = 'X'; // first user to make a move
+        $this->moveCount = 0;
+        $this->moves = [];
         $this->clearScreen();
         $this->displayWelcomeMessage();
     }
@@ -67,25 +83,15 @@ class TicTacToe
     {
         $this->waitForKeypress();
         $this->displayBoard();
-    }
-
-    protected function displayBoardOld()
-    {
-        $no = 1;
-        for ($i = 1; $i < 3; $i++) {
-            for ($j = 1; $j < 3; $j++) {
-                if ($no < 10) {
-                    echo $no . "|" . ++$no . "|" . ++$no . "\n";
-                    ++$no;
-                }
-                if ($i < 2) {
-                    echo "-|-|-\n";
-                }
+        while (true) {
+            $move = $this->getMoveFromUser(); // numeric value 
+            if ($this->makeMove($move)) {
+                $this->displayBoard();
             }
         }
     }
 
-    function displayBoard()
+    private function displayBoard()
     {
         $no = 1;
         echo "\nCurrent Board:\n\n";
@@ -93,8 +99,10 @@ class TicTacToe
             // echo "  " . $this->board[$i][0] . " | " . $this->board[$i][1] . " | " . $this->board[$i][2] . "\n";
 
             $first = trim($this->board[$i][0]) ? $this->board[$i][0] : $no;
-            $second = trim($this->board[$i][1]) ? $this->board[$i][1] : ++$no;
-            $third = trim($this->board[$i][2]) ? $this->board[$i][2] : ++$no;
+            ++$no;
+            $second = trim($this->board[$i][1]) ? $this->board[$i][1] : $no;
+            ++$no;
+            $third = trim($this->board[$i][2]) ? $this->board[$i][2] : $no;
 
             echo "  " . $first . " | " . $second . " | " . $third . "\n";
             if ($i < 2) {
@@ -105,7 +113,23 @@ class TicTacToe
         echo "\n";
     }
 
-    function getMoveFromUser()
+    private function makeMove($moveNo)
+    {
+
+        $movePositionDetail = $this->moveToPosition[$moveNo];
+        $row = $movePositionDetail['row'];
+        $col = $movePositionDetail['col'];
+
+        if ($this->board[$row][$col] === ' ') {
+            $this->board[$row][$col] = $this->currentPlayer;
+            return true;
+        } else {
+            echo "That position is already taken! Choose another one.\n";
+            return false;
+        }
+    }
+
+    private function getMoveFromUser()
     {
         while (true) {
             echo "Player " . $this->currentPlayer . ", enter your move (1 2 ... 9): ";

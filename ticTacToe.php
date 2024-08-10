@@ -178,6 +178,8 @@ class TicTacToe
             }
 
             if ($this->moveCount >= 9) { // Check for a draw condition
+                $gameId = $this->insertGameResult("None");
+                $this->insertGameMoves($gameId, $this->moves);
                 echo "It's a draw!\n";
                 break; // Exit the game loop if it's a draw
             }
@@ -310,21 +312,3 @@ class TicTacToe
         return $colorCode . $text . $reset;
     }
 }
-
-
-class TicTacToeExtended extends TicTacToe
-{
-
-    function __construct()
-    {
-        parent::__construct();
-    }
-
-    public function initiateGame()
-    {
-        $this->startGame();
-    }
-}
-
-$obj = new TicTacToeExtended();
-$obj->initiateGame();

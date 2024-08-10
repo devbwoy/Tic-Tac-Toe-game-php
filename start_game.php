@@ -103,7 +103,6 @@ class TicTacToe
         $no = 1;
         echo "\nCurrent Board:\n\n";
         for ($i = 0; $i < 3; $i++) {
-            // echo "  " . $this->board[$i][0] . " | " . $this->board[$i][1] . " | " . $this->board[$i][2] . "\n";
 
             $first = trim($this->board[$i][0]) ? $this->board[$i][0] : $no;
             ++$no;

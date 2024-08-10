@@ -86,9 +86,13 @@ class TicTacToe
         while (true) {
             $move = $this->getMoveFromUser(); // numeric value 
             if ($this->makeMove($move)) {
-                $this->togglePlayer();
                 $this->displayBoard();
                 ++$this->moveCount;
+                if ($this->moveCount >= 5 && $this->isPlayerWin()) {
+                    echo "Player " . $this->currentPlayer . " wins!\n";
+                    break;
+                }
+                $this->togglePlayer();
             }
 
             if ($this->moveCount >= 9) {
@@ -128,6 +132,7 @@ class TicTacToe
 
         if ($this->board[$row][$col] === ' ') {
             $this->board[$row][$col] = $this->currentPlayer;
+            $this->moves[] = ['player' => $this->currentPlayer, 'row' => $row, 'col' => $col];
             return true;
         } else {
             echo "That position is already taken! Choose another one.\n";
@@ -151,6 +156,27 @@ class TicTacToe
     private function togglePlayer()
     {
         $this->currentPlayer = $this->currentPlayer == 'X' ? 'O' : 'X';
+    }
+
+    private function isPlayerWin()
+    {
+        // Check rows and columns
+        for ($i = 0; $i < 3; $i++) {
+            if (($this->board[$i][0] !== ' ' && $this->board[$i][0] === $this->board[$i][1] && $this->board[$i][1] === $this->board[$i][2]) ||
+                ($this->board[0][$i] !== ' ' && $this->board[0][$i] === $this->board[1][$i] && $this->board[1][$i] === $this->board[2][$i])
+            ) {
+                return true;
+            }
+        }
+
+        // Check diagonals
+        if (($this->board[0][0] !== ' ' && $this->board[0][0] === $this->board[1][1] && $this->board[1][1] === $this->board[2][2]) ||
+            ($this->board[0][2] !== ' ' && $this->board[0][2] === $this->board[1][1] && $this->board[1][1] === $this->board[2][0])
+        ) {
+            return true;
+        }
+
+        return false;
     }
 }
 

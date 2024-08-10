@@ -64,7 +64,7 @@ To view the SQLite database, you can use the SQLite Browser.
 
    After installing the dependencies, execute the following command to run the unit tests:
 
-   `vendor/bin/phpunit --bootstrap vendor/autoload.php tests`
+   `vendor/bin/phpunit ticTacToeTest.php`
 
    Ensure that your test files are located in the `tests` directory and follow PHPUnit naming conventions.
 

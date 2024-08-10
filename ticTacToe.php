@@ -7,7 +7,6 @@ class TicTacToe
 {
     use TicTacToeDatabase; // Use the TicTacToeDatabase trait to manage database operations
 
-    private $debugMode; // Flag to indicate whether the game is in debug mode
     private $board; // The 3x3 Tic-Tac-Toe board
     private $currentPlayer; // Tracks the current player ('X' or 'O')
     private $moveCount; // Tracks the number of moves made in the game
@@ -33,7 +32,7 @@ class TicTacToe
         $this->createTables(); // Create the necessary tables if they don't exist
 
         // Set up initial game state
-        $this->debugMode = true;
+
         $this->board = [
             [' ', ' ', ' '], // Top row
             [' ', ' ', ' '], // Middle row
@@ -80,42 +79,43 @@ class TicTacToe
     // Function to insert a game result into the game_result table
     public function insertGameResult($winner)
     {
-        $stmt = $this->db->prepare("INSERT INTO game_result (winner) VALUES (:winner)");
-        $stmt->bindParam(':winner', $winner);
-        $stmt->execute();
-
-        // Return the last inserted game ID
-        return $this->db->lastInsertId();
+        try {
+            $stmt = $this->db->prepare("INSERT INTO game_result (winner) VALUES (:winner)");
+            $stmt->bindParam(':winner', $winner);
+            $stmt->execute();
+            return $this->db->lastInsertId();
+        } catch (Exception $e) {
+            $this->handleError($e->getMessage());
+            return false;
+        }
     }
 
     // Function to insert multiple game moves into the game_moves table
     public function insertGameMoves($gameId, $gameMoves)
     {
-        $values = [];
-        $params = [];
-        foreach ($gameMoves as $move) {
-            $values[] = "(?, ?, ?, ?)";
-            $params[] = $gameId;
-            $params[] = $move['player'];
-            $params[] = $move['row'];
-            $params[] = $move['col'];
-        }
+        try {
+            $values = [];
+            $params = [];
+            foreach ($gameMoves as $move) {
+                $values[] = "(?, ?, ?, ?)";
+                $params[] = $gameId;
+                $params[] = $move['player'];
+                $params[] = $move['row'];
+                $params[] = $move['col'];
+            }
 
-        // SQL statement for bulk insert of game moves
-        $sql = "INSERT INTO game_moves (game_id, player, row, col) VALUES " . implode(", ", $values);
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
+            $sql = "INSERT INTO game_moves (game_id, player, row, col) VALUES " . implode(", ", $values);
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute($params);
+        } catch (Exception $e) {
+            $this->handleError($e->getMessage());
+        }
     }
 
     // Error handling function
-    private function handleError($exception)
+    private function handleError($message)
     {
-        if ($this->debugMode) {
-            // Display error message in debug mode
-            echo "Debug: " . $exception->getMessage() . "\n";
-        } else {
-            // Log the error or perform other non-debug actions
-        }
+        echo "Error: " . $message . "\n";
     }
 
     // Function to clear the console screen
@@ -130,7 +130,7 @@ class TicTacToe
             }
         } catch (Exception $e) {
             // Handle any errors during screen clearing
-            $this->handleError($e);
+            $this->handleError($e->getMessage());
         }
     }
 

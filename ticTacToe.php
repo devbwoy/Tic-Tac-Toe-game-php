@@ -1,7 +1,12 @@
 <?php
 
+require_once 'TicTacToeDatabase.php';
+
+
 class TicTacToe
 {
+    use TicTacToeDatabase;
+
     private $debugMode;
     private $board;
     private $currentPlayer;
@@ -22,6 +27,9 @@ class TicTacToe
 
     protected function __construct()
     {
+        $this->initializeDatabase();
+        $this->createTables();
+
         $this->debugMode = true;
         $this->board = [
             [' ', ' ', ' '], // Top row
@@ -89,6 +97,8 @@ class TicTacToe
                 $this->displayBoard();
                 ++$this->moveCount;
                 if ($this->moveCount >= 5 && $this->isPlayerWin()) {
+                    $gameId = $this->insertGameResult($this->currentPlayer);
+                    $this->insertGameMoves($gameId, $this->moves);
                     echo "Player " . $this->currentPlayer . " wins!\n";
                     break;
                 }
@@ -177,6 +187,63 @@ class TicTacToe
         }
 
         return false;
+    }
+
+
+    private function createTables()
+    {
+        // SQL statement to create game_result table
+        $createGameResultTable = "
+            CREATE TABLE IF NOT EXISTS game_result (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                winner TEXT NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
+        ";
+
+        // SQL statement to create game_moves table with row and col instead of move_position
+        $createGameMovesTable = "
+            CREATE TABLE IF NOT EXISTS game_moves (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                game_id INTEGER NOT NULL,
+                player TEXT NOT NULL,
+                row INTEGER NOT NULL,
+                col INTEGER NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (game_id) REFERENCES game_result(id)
+            );
+        ";
+
+        // Execute the SQL statements
+        $this->db->exec($createGameResultTable);
+        $this->db->exec($createGameMovesTable);
+    }
+
+    public function insertGameResult($winner)
+    {
+        $stmt = $this->db->prepare("INSERT INTO game_result (winner) VALUES (:winner)");
+        $stmt->bindParam(':winner', $winner);
+        $stmt->execute();
+
+        // Return the last inserted game ID
+        return $this->db->lastInsertId();
+    }
+
+    public function insertGameMoves($gameId, $gameMoves)
+    {
+        $values = [];
+        $params = [];
+        foreach ($gameMoves as $move) {
+            $values[] = "(?, ?, ?, ?)";
+            $params[] = $gameId;
+            $params[] = $move['player'];
+            $params[] = $move['row'];
+            $params[] = $move['col'];
+        }
+
+        $sql = "INSERT INTO game_moves (game_id, player, row, col) VALUES " . implode(", ", $values);
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
     }
 }
 

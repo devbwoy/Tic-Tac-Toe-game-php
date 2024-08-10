@@ -66,8 +66,6 @@ To view the SQLite database, you can use the SQLite Browser.
 
    `vendor/bin/phpunit ticTacToeTest.php`
 
-   Ensure that your test files are located in the `tests` directory and follow PHPUnit naming conventions.
-
 ## Contributing
 
 Feel free to fork the repository, submit issues, or create pull requests with improvements or fixes.
